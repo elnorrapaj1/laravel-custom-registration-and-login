@@ -496,3 +496,9 @@ resources/layouts/app.blade.php
 ```
 <link rel="stylesheet" href="{{asset('css/main.css')}}">
 ```
+
+### 12. Run your project
+
+```
+php artisan serve
+```
