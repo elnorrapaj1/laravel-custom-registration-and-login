@@ -502,3 +502,11 @@ resources/layouts/app.blade.php
 ```
 php artisan serve
 ```
+
+## Screenshot
+
+<img src="public/images/login.png" width=100% height=100%>
+<br>
+<img src="public/images/register.png" width=100% height=100%>
+<br>
+<img src="public/images/welcome.png" width=100% height=100%>
