@@ -229,7 +229,7 @@ class RedirectIfAuthenticated
 
 ### 10. Create Resources
 
-resources/layouts/app.blade.php
+resources/views/layouts/app.blade.php
 
 ```
 <!DOCTYPE html>
@@ -256,7 +256,7 @@ resources/layouts/app.blade.php
 </html>
 ```
 
-resources/login.blade.php
+resources/views/login.blade.php
 
 ```
 @extends('layouts.app')
@@ -309,7 +309,7 @@ resources/login.blade.php
 @endsection
 ```
 
-resources/register.blade.php
+resources/views/register.blade.php
 
 ```
 @extends('layouts.app')
@@ -368,7 +368,7 @@ resources/register.blade.php
 @endsection
 ```
 
-resources/welcome.blade.php
+resources/views/welcome.blade.php
 
 ```
 @extends('layouts.app')
@@ -489,7 +489,7 @@ hr {
 }
 ```
 
-resources/layouts/app.blade.php
+resources/views/layouts/app.blade.php
 
 > Add the below line inside your head tag
 
