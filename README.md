@@ -1,66 +1,498 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel 10 Custom Registration and Login
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Hi Viewers, In this example you can see the source code of Custom Registration and Login in Laravel 10
 
-## About Laravel
+## Getting Started
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### 1. Create a new project
 
--   [Simple, fast routing engine](https://laravel.com/docs/routing).
--   [Powerful dependency injection container](https://laravel.com/docs/container).
--   Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
--   Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
--   Database agnostic [schema migrations](https://laravel.com/docs/migrations).
--   [Robust background job processing](https://laravel.com/docs/queues).
--   [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+```
+composer create-project laravel/laravel custom-login
+```
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Set your Database name, Username, and Password in the .env file
 
-## Learning Laravel
+This folder will be available in your project root folder
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE= // set database name
+DB_USERNAME= // set username
+DB_PASSWORD= // set password
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 3. Install Yoeunes toast package
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+```
+composer require yoeunes/toastr
+```
 
-## Laravel Sponsors
+### 4. Now migrate your table
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```
+php artisan migrate
+```
 
-### Premium Partners
+### 5. Create an Auth Controller
 
--   **[Vehikl](https://vehikl.com/)**
--   **[Tighten Co.](https://tighten.co)**
--   **[WebReinvent](https://webreinvent.com/)**
--   **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
--   **[64 Robots](https://64robots.com)**
--   **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
--   **[Cyber-Duck](https://cyber-duck.co.uk)**
--   **[DevSquad](https://devsquad.com/hire-laravel-developers)**
--   **[Jump24](https://jump24.co.uk)**
--   **[Redberry](https://redberry.international/laravel/)**
--   **[Active Logic](https://activelogic.com)**
--   **[byte5](https://byte5.de)**
--   **[OP.GG](https://op.gg)**
+```
+php artisan make:controller AuthController
+```
 
-## Contributing
+app/Http/Controllers/AuthController.php
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+```
+<?php
 
-## Code of Conduct
+namespace App\Http\Controllers;
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
-## Security Vulnerabilities
+class AuthController extends Controller
+{
+    public function loginIndex()
+    {
+        return view('login');
+    }
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+    public function registerIndex()
+    {
+        return view('register');
+    }
 
-## License
+    public function login(Request $request)
+    {
+        $this->validate($request, [
+            'email' => 'required|email',
+            'password' => 'required|min:8',
+        ]);
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+        $credentials = $request->only('email', 'password');
+
+        if (Auth::attempt($credentials)) {
+            return redirect('/');
+        }
+
+        toastr()->error('Invalid email or password');
+        return redirect('login');
+    }
+
+    public function register(Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:8',
+        ]);
+
+        $user = new User();
+        $user->name = $request->name;
+        $user->email = $request->email;
+        $user->password = $request->password;
+        $user->save();
+
+        Auth::login($user);
+        toastr()->success('Registration successful!');
+        return redirect('/');
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        toastr()->success('Logout successful!');
+        return redirect('login');
+    }
+}
+```
+
+### 6. Create a Welcome Controller
+
+```
+php artisan make:controller WelcomeController
+```
+
+app/Http/Controllers/WelcomeController.php
+
+```
+<?php
+
+namespace App\Http\Controllers;
+
+class WelcomeController extends Controller
+{
+    public function index()
+    {
+        return view('welcome');
+    }
+}
+```
+
+### 7. Modify web.php file
+
+routes/web.php
+
+```
+<?php
+
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\WelcomeController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+ */
+
+Route::middleware('guest')->group(function () {
+    Route::get('login', [AuthController::class, 'loginIndex']);
+    Route::get('register', [AuthController::class, 'registerIndex']);
+
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/', [WelcomeController::class, 'index']);
+    Route::get('logout', [AuthController::class, 'logout']);
+});
+```
+
+### 8. Modify Auth Middleware
+
+app/Middleware/Authenticate.php
+
+```
+<?php
+
+namespace App\Http\Middleware;
+
+use Illuminate\Auth\Middleware\Authenticate as Middleware;
+use Illuminate\Http\Request;
+
+class Authenticate extends Middleware
+{
+    /**
+     * Get the path the user should be redirected to when they are not authenticated.
+     */
+    protected function redirectTo(Request $request): ?string
+    {
+        return $request->expectsJson() ? null : url('login');
+    }
+}
+```
+
+### 9. Modify Guest Middleware
+
+app/Middleware/RedirectIfAuthenticated.php
+
+```
+<?php
+
+namespace App\Http\Middleware;
+
+use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
+
+class RedirectIfAuthenticated
+{
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
+    public function handle(Request $request, Closure $next, string...$guards): Response
+    {
+        $guards = empty($guards) ? [null] : $guards;
+
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return redirect('/');
+            }
+        }
+
+        return $next($request);
+    }
+}
+```
+
+### 10. Create Resources
+
+resources/layouts/app.blade.php
+
+```
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@yield('title') | {{env('APP_NAME')}}</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<body>
+
+    @yield('content')
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
+```
+
+resources/login.blade.php
+
+```
+@extends('layouts.app')
+@section('title', 'Login')
+@section('content')
+
+<section class="bg-body-tertiary">
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm py-3 px-4">
+                        <div class="text-center py-2 mb-3">
+                            <p class="mb-0 text-uppercase fw-bold text-secondary">
+                                Welcome Back
+                            </p>
+                        </div>
+                        <form class="row gy-3" action="{{url('login')}}" method="post">
+                            @csrf
+                            <div class="col-12">
+                                <label for="emailInp" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="emailInp" name="email"
+                                    value="{{old('email')}}">
+                                @error('email')<small class="text-danger">{{$message}}</small>@enderror
+                            </div>
+                            <div class="col-12">
+                                <label for="passInp" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="passInp" name="password">
+                                @error('password')<small class="text-danger">{{$message}}</small>@enderror
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" type="submit">Login</button>
+                            </div>
+                        </form>
+                        <div class="mt-3 text-center">
+                            <p class="mb-0">
+                                I dont't have an account?
+                                <a class="fw-medium" href="{{url('register')}}">
+                                    Register
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@endsection
+```
+
+resources/register.blade.php
+
+```
+@extends('layouts.app')
+@section('title', 'Register')
+@section('content')
+
+<section class="bg-body-tertiary">
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card border-0 shadow-sm py-3 px-4">
+                        <div class="text-center py-2 mb-3">
+                            <p class="mb-0 text-uppercase fw-bold text-secondary">
+                                Create new account
+                            </p>
+                        </div>
+                        <form class="row gy-3" action="{{url('register')}}" method="post">
+                            @csrf
+                            <div class="col-12">
+                                <label for="nameInp" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="nameInp" name="name"
+                                    value="{{old('name')}}">
+                                @error('name')<small class="text-danger">{{$message}}</small>@enderror
+                            </div>
+                            <div class="col-12">
+                                <label for="emailInp" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="emailInp" name="email"
+                                    value="{{old('email')}}">
+                                @error('email')<small class="text-danger">{{$message}}</small>@enderror
+                            </div>
+                            <div class="col-12">
+                                <label for="passInp" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="passInp" name="password">
+                                @error('password')<small class="text-danger">{{$message}}</small>@enderror
+                            </div>
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100" type="submit">Register</button>
+                            </div>
+                        </form>
+                        <div class="mt-3 text-center">
+                            <p class="mb-0">
+                                Already have an account?
+                                <a class="fw-medium" href="{{url('login')}}">
+                                    Login
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@endsection
+```
+
+resources/welcome.blade.php
+
+```
+@extends('layouts.app')
+@section('title', 'Welcome')
+@section('content')
+
+<section class="bg-body-tertiary">
+    <div class="d-flex justify-content-center align-items-center min-vh-100">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card shadow-sm border-0 p-3">
+                        <div class="text-center">
+                            <h5 class="text-success fw-semibold">
+                                {{auth()->user()->name}}
+                            </h5>
+                            <p class="text-secondary">
+                                {{auth()->user()->email}}
+                            </p>
+                            <a class="btn btn-sm btn-danger" href="{{url('logout')}}">
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@endsection
+```
+
+### 11. Adding Custom CSS (Optional)
+
+public/css/main.css
+
+```
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
+
+/*--------------------------------------------------------------
+# General
+--------------------------------------------------------------*/
+:root {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: "Roboto", sans-serif;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+}
+
+a:hover,
+a:focus {
+    text-decoration: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    transition: background-color 5000s ease-in-out 0s;
+}
+
+textarea {
+    resize: none;
+}
+
+hr {
+    margin: 10px 0px;
+    color: darkgray;
+}
+
+::-moz-selection {
+    color: #ffffff;
+    background: var(--bs-primary);
+}
+
+::selection {
+    color: #ffffff;
+    background: var(--bs-primary);
+}
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 8px;
+    background-color: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #aab7cf;
+}
+
+/*--------------------------------------------------------------
+# Override some default Bootstrap stylings
+--------------------------------------------------------------*/
+*:focus {
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.form-control,
+.form-select {
+    border-radius: 4px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus,
+.form-select:focus {
+    background-color: #fdfdfd;
+    border: 1.5px solid var(--bs-primary);
+    outline: 0;
+    box-shadow: 0 0 0.25rem 0.05rem rgba(105, 108, 255, 0.1);
+}
+```
+
+resources/layouts/app.blade.php
+
+> Add the below line inside your head tag
+
+```
+<link rel="stylesheet" href="{{asset('css/main.css')}}">
+```
