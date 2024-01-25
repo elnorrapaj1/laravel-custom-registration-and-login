@@ -1,6 +1,6 @@
 # Laravel 10 Custom Registration and Login
 
-Hi Viewers, In this example you can see the source code of Custom Registration and Login in Laravel 10
+This repository provides an example of a custom registration and login system implemented in Laravel 10.
 
 ## Getting Started
 
@@ -10,26 +10,26 @@ Hi Viewers, In this example you can see the source code of Custom Registration a
 composer create-project laravel/laravel custom-login
 ```
 
-### 2. Set your Database name, Username, and Password in the .env file
+### 2. Set up your database credentials
 
-This folder will be available in your project root folder
+Update the .env file in your project root with your database details:
 
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE= // set database name
-DB_USERNAME= // set username
-DB_PASSWORD= // set password
+DB_DATABASE=your_database_name
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
 ```
 
-### 3. Install Yoeunes toast package
+### 3. Install Yoeunes toastr package
 
 ```
 composer require yoeunes/toastr
 ```
 
-### 4. Now migrate your table
+### 4. Migrate your database tables
 
 ```
 php artisan migrate
@@ -131,7 +131,7 @@ class WelcomeController extends Controller
 }
 ```
 
-### 7. Modify web.php file
+### 7. Modify web.php routes file
 
 routes/web.php
 
