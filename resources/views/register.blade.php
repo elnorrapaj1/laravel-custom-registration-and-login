@@ -13,24 +13,26 @@
                                 Create new account
                             </p>
                         </div>
-                        <form class="row gy-3" action="{{url('register')}}" method="post">
+                        <form class="row gy-3" action="{{ route('register') }}" method="post">
                             @csrf
                             <div class="col-12">
                                 <label for="nameInp" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="nameInp" name="name"
-                                    value="{{old('name')}}">
-                                @error('name')<small class="text-danger">{{$message}}</small>@enderror
+                                <input type="text" class="form-control" id="nameInp" name="name" value="{{ old('name') }}">
+                                @error('name')<small class="text-danger">{{ $message }}</small>@enderror
                             </div>
                             <div class="col-12">
                                 <label for="emailInp" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="emailInp" name="email"
-                                    value="{{old('email')}}">
-                                @error('email')<small class="text-danger">{{$message}}</small>@enderror
+                                <input type="email" class="form-control" id="emailInp" name="email" value="{{ old('email') }}">
+                                @error('email')<small class="text-danger">{{ $message }}</small>@enderror
                             </div>
                             <div class="col-12">
                                 <label for="passInp" class="form-label">Password</label>
                                 <input type="password" class="form-control" id="passInp" name="password">
-                                @error('password')<small class="text-danger">{{$message}}</small>@enderror
+                                @error('password')<small class="text-danger">{{ $message }}</small>@enderror
+                            </div>
+                            <div class="col-12">
+                                <label for="passInp_confirmation" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="passInp_confirmation" name="password_confirmation">
                             </div>
                             <div class="col-12">
                                 <button class="btn btn-primary w-100" type="submit">Register</button>
@@ -39,7 +41,7 @@
                         <div class="mt-3 text-center">
                             <p class="mb-0">
                                 Already have an account?
-                                <a class="fw-medium" href="{{url('login')}}">
+                                <a class="fw-medium" href="{{ route('login') }}">
                                     Login
                                 </a>
                             </p>

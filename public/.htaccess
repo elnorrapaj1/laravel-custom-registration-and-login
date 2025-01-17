@@ -19,3 +19,17 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# Remove or comment out IP blocking rules to prevent blocking legitimate requests
+# <IfModule mod_authz_core.c>
+#     <RequireAll>
+#         Require all granted
+#         Require not ip 207.180.225.92
+#     </RequireAll>
+# </IfModule>
+
+# <IfModule !mod_authz_core.c>
+#     Order allow,deny
+#     Allow from all
+#     Deny from 207.180.225.92
+# </IfModule>
